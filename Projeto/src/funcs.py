@@ -1,20 +1,124 @@
 # Import necessary libraries
+from auxiliares import *
 from collections import deque
+import networkx as nx
+import matplotlib.pyplot as plt
 
 #----------------------------------------Funcionalidade 1----------------------------------------
-# Gerar os circuitos de entrega, caso existam, que cubram um determinado território. 
-def dfs_paths(graph, start, goal):
-    stack = [(start, [start])]
-    while stack:
-        (vertex, path) = stack.pop()
-        if vertex in graph:  # Verifique se a chave existe no dicionário
-            for next in set([neighbor[0] for neighbor in graph[vertex]]) - set(path):
-                if next == goal:
-                    yield path + [next]
-                else:
-                    stack.append((next, path + [next]))
 
 
+def most_ecological_courier(couriers):
+    max_orders = 0
+    max_ids = []
+
+    for courier in couriers:
+        order_count = orders_by_bike(courier[0])
+
+        if order_count > max_orders:
+            max_orders = order_count
+            max_ids = [courier[0]]
+        elif order_count == max_orders:
+            max_ids.append(courier[0])
+
+    return max_ids
+
+def get_most_ecological_courier():
+    couriers = get_all_estafetas()
+    most_ecological = most_ecological_courier(couriers)
+    
+    return most_ecological
+
+#----------------------------------------Funcionalidade 2----------------------------------------
+#'Consultar os estafetas que entregaram determinada(s) encomenda(s) a um determinado cliente.',
+# Encomenda: #IdEnc, #IdCliente, Peso, Volume, Prazo, DataInicio, DataFim
+# Data: #Ano, Mês, Dia, Hora, Minuto
+# IdEnc: #12 dígitos
+
+def get_couriers_by_client(client_id):
+    lista_de_encomendas = get_encomenta_by_client(client_id)
+    lista_de_estafetas = get_estafeta_by_encomenda(lista_de_encomendas)
+    
+    # Remove duplicates from the list by converting it to a set and then back to a list.
+    lista_de_estafetas_unicos = list(set(lista_de_estafetas))
+    
+    return sorted(lista_de_estafetas_unicos)
+
+#----------------------------------------Funcionalidade 3----------------------------------------
+ #'Consultar os clientes servidos por um determinado estafeta.',
+ # Encomenda: #IdEnc, #IdCliente, Peso, Volume, Prazo, DataInicio, DataFim
+def get_clientes_by_estafeta(estafeta_id):
+    lista_de_encomendas = get_encomenda_by_estafeta(estafeta_id)
+    lista_de_clientes = get_cliente_from_encomenda(lista_de_encomendas)
+    
+    # Remove duplicates from the list by converting it to a set and then back to a list.
+    lista_de_clientes_unicos = list(set(lista_de_clientes))
+    
+    return sorted(lista_de_clientes_unicos)
+
+#----------------------------------------Funcionalidade 4----------------------------------------
+#'Calcular o valor faturado pela Health Planet num determinado dia.',
+def faturamento_diario(ano, mes, dia):
+    # Obter todas as encomendas para o dia especificado
+    encomendas_do_dia = obter_encomendas_por_dia(ano, mes, dia)
+
+    # Calcular os preços para todas as encomendas do dia
+    precos = precos_lista_encomendas(encomendas_do_dia)
+
+    # Retornar o total (faturamento do dia)
+    return sum(precos)
+ 
+#----------------------------------------Funcionalidade 5----------------------------------------
+#'Consultar quais as zonas (e.g., rua ou freguesia) com maior volume de entregas por parte da Health Planet.',
+def freguesiasMaisFrequentes():
+    lista_encomendas_dos_estafetas = [estafeta[1] for estafeta in estafetas]
+    listaTodasFreg = todasAsFreguesias_da(lista_encomendas_dos_estafetas)
+    listaMaisFrequentes = freguesiasMaisFrequentes_da(listaTodasFreg)
+    return listaMaisFrequentes
+
+#----------------------------------------Funcionalidade 6----------------------------------------
+#Calcular a classificação média de satisfação de cliente para um determinado estafeta.
+
+def classificacao_media(estafeta_id):
+    classificacoes = []
+    for estafeta in estafetas:
+        if estafeta[0] == estafeta_id:
+            for order in estafeta[1]:
+                if order[1] != None:
+                    classificacoes.append(order[1])
+    if len(classificacoes) == 0:
+        return None
+    return sum(classificacoes) / len(classificacoes)
+
+#----------------------------------------Funcionalidade 7----------------------------------------
+#'Consultar o número total de entregas pelos diferentes meios de transporte, num determinado intervalo de tempo.',
+from datetime import datetime
+# Encomenda: #IdEnc, #IdCliente, Peso, Volume, Prazo, DataInicio, DataFim
+# Data: #Ano, Mês, Dia, Hora, Minuto
+# IdEnc: #12 dígitos
+# Estafeta: #IdEstaf, [ (#IdEnc,Nota,Transporte,Freguesia) | T]
+def numeroTotalEntregasTransporte(start_date, end_date):
+    # calcular o numero total de entregas pelos diferentes meios de transporte
+
+    # obter todas as encomendas no intervalo de tempo especificado
+    encomendas_no_intervalo = obter_encomendas_por_intervalo(start_date, end_date)
+    
+    # obter os transportes de todas as encomendas no intervalo de tempo especificado
+    transportes = [get_transporte_by_encomenda(encomenda[0]) for encomenda in encomendas_no_intervalo]
+    
+    # contar o numero de transportes de cada tipo
+    transportes_contados = {}
+    for transporte in transportes:
+        if transporte in transportes_contados:
+            transportes_contados[transporte] += 1
+        else:
+            transportes_contados[transporte] = 1
+            
+    return transportes_contados
+
+
+
+
+#----------------------------------------Funcionalidade 13----------------------------------------
 
 def all_paths_to_goal(graph, goal):
     all_paths = []
@@ -24,4 +128,31 @@ def all_paths_to_goal(graph, goal):
             all_paths.extend(paths)
     return all_paths
 
+#----------------------------------------Funcionalidade 14----------------------------------------
+# Representar os diversos pontos de entrega (freguesias) disponíveis em forma de grafo.
 
+def show_graph(grafo):
+    G = nx.Graph()
+
+    for node, edges in grafo.items():
+        for edge, weight in edges:
+            G.add_edge(node, edge, weight=weight)
+
+    pos = nx.spring_layout(G)
+    nx.draw(G, pos, with_labels=True)
+    labels = nx.get_edge_attributes(G, 'weight')
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+
+    plt.show()
+    
+#----------------------------------------Funcionalidade 15----------------------------------------
+
+def circuit_with_max_deliveries(weight_or_volume, grafo):
+    paths = all_paths(grafo)
+    
+    if weight_or_volume == 0:
+        max_path = max_deliveries_by_weight(paths, grafo)
+    elif weight_or_volume == 1:
+        max_path = max_deliveries_by_volume(paths, grafo)
+        
+    return max_path
