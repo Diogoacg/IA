@@ -115,8 +115,73 @@ def numeroTotalEntregasTransporte(start_date, end_date):
             
     return transportes_contados
 
+#----------------------------------------Funcionalidade 8----------------------------------------
+#'Consultar o número total de entregas pelos estafetas, num determinado intervalo de tempo.',
 
+def numeroTotalEntregasEstafeta(start_date, end_date):
+    # obter todas as encomendas no intervalo de tempo especificado
+    encomendas_no_intervalo = obter_encomendas_por_intervalo(start_date, end_date)
+    
+    # obter os estafetas de todas as encomendas no intervalo de tempo especificado
+    estafetas = [get_estafeta_by_encomenda(encomenda) for encomenda in encomendas_no_intervalo]
+    
+    print(estafetas)
+    # contar o numero de estafetas de cada tipo
+    estafetas_contados = {}
+    for estafeta in estafetas:
+        if estafeta in estafetas_contados:
+            estafetas_contados[estafeta] += 1
+        else:
+            estafetas_contados[estafeta] = 1
+            
+    return estafetas_contados
+#----------------------------------------Funcionalidade 9----------------------------------------
+#Calcular o número de encomendas entregues e não entregues pela Health Planet, num determinado período de tempo.
 
+def numeroEncomendasEntreguesNaoEntregues(start_date, end_date):
+    # obter todas as encomendas no intervalo de tempo especificado
+    encomendas_no_intervalo = obter_encomendas_por_intervalo(start_date, end_date)
+    
+    # contar o numero de encomendas entregues
+    encomendas_entregues = 0
+    for encomenda in encomendas_no_intervalo:
+        if encomenda[6] != (0,0,0,0,0):
+            encomendas_entregues += 1
+            
+    return (encomendas_entregues, len(encomendas_no_intervalo) - encomendas_entregues)
+
+#----------------------------------------Funcionalidade 10----------------------------------------
+#Calcular o peso total transportado por estafeta num determinado dia.
+
+def pesoTotalTransportadoPorEstafeta( ano, mes, dia):
+    encomendas_do_dia = obter_encomendas_por_dia(ano, mes, dia)
+     
+    pesos = {}
+    for encomenda in encomendas_do_dia:
+        estafeta = get_estafeta_by_encomenda(encomenda)
+        peso = encomenda[2]
+        if estafeta in pesos:
+            pesos[estafeta] += peso
+        else:
+            pesos[estafeta] = peso
+    return pesos
+    
+#----------------------------------------Funcionalidade 11---------------------------------------- 
+#Consultar o cliente que fez mais encomendas.
+
+def clienteQueFezMaisEncomendas():
+    lista_de_clientes = [order[1] for order in encomendas]
+    return clienteQueFezMaisEncomendas_da(lista_de_clientes)
+       
+#----------------------------------------Funcionalidade 12----------------------------------------
+#Consultar os estefetas menos pontuais a fazer as suas entregas.
+def estafetas_menos_pontuais():
+    estafetas_id = [estafeta[0] for estafeta in estafetas]
+    r = encomendas_nao_entregues_e_atrasadas()
+    ratios = {estaf: racio_estafeta(estaf, r) for estaf in estafetas_id}
+    max_ratio = max(ratios.values())
+    l = [estaf for estaf, ratio in ratios.items() if ratio == max_ratio]
+    return (l, max_ratio)
 
 #----------------------------------------Funcionalidade 13----------------------------------------
 

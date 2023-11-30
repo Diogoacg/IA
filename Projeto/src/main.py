@@ -109,6 +109,45 @@ def funcionalidade(option):
         print(numeroTotalEntregasTransporte(data_inicio, data_fim))
         
         print('-----------------------------------------------------------------------------------------------------------------------')
+        
+    def func8():
+        #'Consultar o número total de entregas pelos estafetas, num determinado intervalo de tempo.',
+        print('Insira a data de início no formato (ano, mês, dia, horas, minutos): ')
+        data_inicio = eval(input())
+        print('Insira a data de fim no formato (ano, mês, dia,horas, minutos): ')
+        data_fim = eval(input())
+        print(numeroTotalEntregasEstafeta(data_inicio, data_fim))
+        
+        print('-----------------------------------------------------------------------------------------------------------------------')
+    
+    def func9():
+        #'Calcular o número de encomendas entregues e não entregues pela Health Planet, num determinado período de tempo.',
+        print('Insira a data de início no formato (ano, mês, dia, horas, minutos): ')
+        data_inicio = eval(input())
+        print('Insira a data de fim no formato (ano, mês, dia,horas, minutos): ')
+        data_fim = eval(input())
+        [encomendas_entregues, encomendas_nao_entregues] = numeroEncomendasEntreguesNaoEntregues(data_inicio, data_fim)
+        print('Encomendas entregues: ', encomendas_entregues)
+        print('Encomendas não entregues: ', encomendas_nao_entregues)
+        
+        print('-----------------------------------------------------------------------------------------------------------------------')     
+        
+    def func10():
+        #'Calcular o peso total transportado por estafeta num determinado dia.',
+        print('Insira a data no formato (ano, mês, dia): ')
+        data = eval(input())
+        print(pesoTotalTransportadoPorEstafeta(data[0], data[1], data[2]))
+        
+        print('-----------------------------------------------------------------------------------------------------------------------')
+    
+    def func11():
+        #'Consultar o cliente que fez mais encomendas.',
+        print('Cliente que fez mais encomendas: ')
+        print(clienteQueFezMaisEncomendas())
+        
+        print('-----------------------------------------------------------------------------------------------------------------------')
+        
+        print('-----------------------------------------------------------------------------------------------------------------------')
     def func13():
         print('-----------------------------------------------------------------------------------------------------------------------')
         print('Territórios disponíveis: ')
@@ -123,6 +162,12 @@ def funcionalidade(option):
         else:
             print('Não existem informações sobre este território.')
 
+    def func12():
+        print('-----------------------------------------------------------------------------------------------------------------------')
+        print('Estafetas menos pontuais: ')
+        print(estafetas_menos_pontuais())
+        print('-----------------------------------------------------------------------------------------------------------------------')
+        
     def func14():
         print('-----------------------------------------------------------------------------------------------------------------------')
         print('Mapa de pontos de entrega: ')
@@ -148,11 +193,11 @@ def funcionalidade(option):
          '5': func5,
          '6': func6,
          '7': func7,
-        # '8': func8,
-        # '9': func9,
-        # '10': func10,
-        # '11': func11,
-        # '12': func12,
+         '8': func8,
+         '9': func9,
+         '10': func10,
+         '11': func11,
+         '12': func12,
         '13': func13,
         '14': func14,
         '15': func15,

@@ -25,7 +25,7 @@ def get_transporte_by_encomenda(id_enc):
 def obter_encomendas_por_intervalo(start_date, end_date):
     lista_de_encomendas = []
     for order in encomendas:
-        if start_date <= order[6] <= end_date:
+        if start_date <= order[5] <= end_date:
             lista_de_encomendas.append(order)
     return lista_de_encomendas
 
@@ -54,13 +54,13 @@ def get_encomenta_by_client(client_id):
     return lista_de_encomendas
 
 def get_estafeta_by_encomenda(lista_de_encomendas):
-    lista_de_estafetas = []
+    estafeta_id = 0
     for encomenda in lista_de_encomendas:
         for estafeta in estafetas:
             for order in estafeta[1]:
                 if order[0] == encomenda:
-                    lista_de_estafetas.append(estafeta[0])
-    return lista_de_estafetas
+                    estafeta_id = estafeta[0]
+    return estafeta_id
 
 def get_encomenda_by_estafeta(estafeta_id):
     lista_de_encomendas = []
@@ -102,8 +102,51 @@ def freguesiasMaisFrequentes_da(lista_de_freguesias):
 
     return modas
 
+def clienteQueFezMaisEncomendas_da(lista_de_clientes):
+    from collections import Counter
 
+    contagem = Counter(lista_de_clientes)
+    maximo = max(list(contagem.values()))
+    modas = [k for k,v in contagem.items() if v == maximo]
+
+    return modas #retorna uma lista para caso de empate
+
+# se a data for 2023-06-24 20:30 e o prazo for 8 horas, a data máxima de entrega é 2023-06-25 4:30
+def data_maxima_de_entrega(data , prazo):
+    ano, mes, dia, hora, minuto = data
+    if prazo == 'Imediato':
+        return (ano, mes, dia, hora, minuto + 30)
+    else:
+        n, s = prazo.split(' ')
+        if s == 'horas':
+            if hora + int(n) > 23:
+                return (ano, mes, dia + 1, hora + int(n) - 24, minuto)
+            else:
+                return (ano, mes, dia, hora + int(n), minuto)
+        else:
+            return (ano, mes, dia + int(n) + 1 , 0, 0)
     
+#   def estafetas_menos_pontuais():
+#     estafetas_id = [estafeta[0] for estafeta in estafetas]
+#     r = encomendas_nao_entregues_e_atrasadas()
+#     ratio = racio_estafetas_aux(estafetas_id, r)
+#     l = estafetas_maior_ratio(ratio, r)
+#     return l  
+    
+def encomendas_nao_entregues_e_atrasadas():
+    lista_de_encomendas = []
+    for order in encomendas:
+        if order[6] == (0,0,0,0,0) or order[6] > data_maxima_de_entrega(order[5], order[4]):
+            lista_de_encomendas.append(order)
+    return lista_de_encomendas
+
+def racio_estafeta(id_estaf, l):
+    encomendas_do_estafeta = get_encomenda_by_estafeta(id_estaf) #lista de encomendas_id
+    c = len(encomendas_do_estafeta)
+    e = [encomenda[0] for encomenda in l if encomenda[0] in encomendas_do_estafeta]
+    t = len(e)
+    return t/c
+
 
 def preco_encomenda(id_enc):
     print(id_enc)
@@ -155,7 +198,7 @@ def calcula_preco_por_transporte(transporte):
 
 def precos_lista_encomendas(lista_de_encomendas):
     return [preco_encomenda(id_enc[0]) for id_enc in lista_de_encomendas]
- 
+
 
 # Gerar os circuitos de entrega, caso existam, que cubram um determinado território. 
 def dfs_paths(graph, start, goal):
