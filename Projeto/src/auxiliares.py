@@ -243,3 +243,131 @@ def max_deliveries_by_volume(paths, grafo):
             max_volume = volume
             max_path = path
     return max_path
+
+# algoritmos de pesquisa
+
+# # We will also need a function for DFS traversal
+# def dfs_path(graph, start, goal):
+#     stack = [(start, [start], 0)]
+#     while stack:
+#         (vertex, path, distance) = stack.pop()
+#         if vertex in graph:  # Check if the key exists in the dictionary
+#             for next in graph[vertex]:
+#                 new_distance = distance + next[1]
+#                 if next[0] == goal:
+#                     return path + [next[0]], new_distance
+#                 else:
+#                     stack.append((next[0], path + [next[0]], new_distance))
+#     return None, None
+
+# # BFS algorithm que retorna o caminho mais curto encontrado
+# def bfs_path(graph, start, goal):
+#     queue = [(start, [start], 0)]
+#     while queue:
+#         (vertex, path, distance) = queue.pop(0)
+#         if vertex in graph:  # Check if the key exists in the dictionary
+#             for next in graph[vertex]:
+#                 new_distance = distance + next[1]
+#                 if next[0] == goal:
+#                     return path + [next[0]], new_distance
+#                 else:
+#                     queue.append((next[0], path + [next[0]], new_distance))
+#     return None, None
+
+
+
+#encontra o destino de uma encomenda pelo id
+def find_destination(id_enc):
+    for order in encomendas_por_entregar:
+        if order[0] == id_enc:
+            
+            return order[4]
+        
+def find_peso(id_enc):
+    for order in encomendas_por_entregar:
+        if order[0] == id_enc:
+            return order[2]
+
+# Now we can define our main functions
+def resolveDFS(start_node, goal_node):
+    path, distance = grafo.procura_DFS(start_node, goal_node)
+    if path is None:  # No path found
+        return None, float('inf')
+    # Double the distance because it's a round trip
+    return path + path[::-1], distance * 2
+
+def resolveDFSTempo( id_enc):
+    start_node = 'Health Planet'
+    goal_node = find_destination(id_enc)
+
+    result = grafo.procura_DFS(start_node, goal_node)
+    if result is None:  # No path found
+        return None, float('inf')
+    else:
+        path, distance = result
+
+    print(distance)
+    # Calculate delivery time based on some function tempoEntregaEncomenda
+    time = tempoEntregaEncomenda(id_enc, distance)
+
+    return path + path[::-1], time
+
+
+
+def resolveBFS(start_node, goal_node):
+    path, distance = grafo.procura_BFS(start_node, goal_node)
+    if path is None:  # No path found
+        return None, float('inf')
+    # Double the distance because it's a round trip
+    return path + path[::-1], distance * 2
+
+def resolveBFSTempo(id_enc):
+    start_node = 'Health Planet'
+    goal_node = find_destination(id_enc)
+
+    result = grafo.procura_BFS(start_node, goal_node)
+    if result is None:  # No path found
+        return None, float('inf')
+    else:
+        path, distance = result
+
+    print(distance)
+    # Calculate delivery time based on some function tempoEntregaEncomenda
+    time = tempoEntregaEncomenda(id_enc, distance)
+
+    return path + path[::-1], time
+
+# Define a function to get the appropriate transportation method based on total weight
+def meioDeTransporteUsado(peso_total):
+    if peso_total <= 5:
+        return 'Bicicleta'
+    elif peso_total <= 20:
+        return 'Mota'
+    elif peso_total <= 100:
+        return 'Carro'
+    else:
+        return None
+
+# Define a function to calculate delivery speed based on transportation method and weight
+def velocidadeEntrega(transporte, peso):
+    if transporte == 'Bicicleta':
+        return 10 - peso * 0.7
+    elif transporte == 'Mota':
+        return 35 - peso * 0.5
+    elif transporte == 'Carro':
+        return 25 - peso * 0.1
+    else:
+        return None
+
+# Define a function to calculate delivery time based on distance and speed
+def tempoEntregaEncomenda(id_enc, d):
+    velocidade = velocidadeEncomenda(id_enc)
+    return d / velocidade if velocidade else float('inf')
+
+# Define a function to calculate delivery speed based on id and weight
+def velocidadeEncomenda(id_enc):
+    peso = find_peso(id_enc)
+    transporte = meioDeTransporteUsado(peso)
+    return velocidadeEntrega(transporte, peso)
+
+    

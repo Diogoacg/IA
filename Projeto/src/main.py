@@ -171,7 +171,7 @@ def funcionalidade(option):
     def func14():
         print('-----------------------------------------------------------------------------------------------------------------------')
         print('Mapa de pontos de entrega: ')
-        show_graph(grafo)
+        grafo.desenha()
         print('-----------------------------------------------------------------------------------------------------------------------')
     #'Identificar quais os circuitos com maior número de entregas (por volume e peso).',
     def func15():
@@ -185,6 +185,18 @@ def funcionalidade(option):
         print('Circuito com maior número de entregas: ')
         print(circuit_with_max_deliveries(weight_or_volume, grafo))
         print('-----------------------------------------------------------------------------------------------------------------------')
+        
+    def func16():
+        print('-----------------------------------------------------------------------------------------------------------------------')
+        print('Comparar circuitos de entrega tendo em conta os indicadores de produtividade.')
+        
+        for order in encomendas_por_entregar:
+            print('-----------------------------------------------------------------------------------------------------------------------')
+            print('Encomenda: ', order)
+            print('Circuito DFS: ', resolveDFSTempo(order[0]))
+            print('Circuito BFS: ', resolveBFSTempo(order[0]))
+            print('-----------------------------------------------------------------------------------------------------------------------')
+
     case = {
          '1': func1,
          '2': func2,
@@ -201,7 +213,7 @@ def funcionalidade(option):
         '13': func13,
         '14': func14,
         '15': func15,
-        # '16': func16,
+        '16': func16,
         # '17': func17,
         # '18': func18,
         # '19': func19,

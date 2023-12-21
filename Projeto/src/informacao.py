@@ -78,24 +78,310 @@ estafetas = [
     (17,[(125400133654,3.8,'Mota','Navarra'),(124578512366,4.1,'Carro','Ferreiros')]),
     # ... add more estafetas here ...
 ]
+#IdEnc, IdEstafeta, Peso, Volume, Freguesia
+encomendas_por_entregar = [
+    (300145999366,1,5,30,'Arentim'),
+    (142019203922,2,7,21,'Ferreiros'),
+    (723100045791,3,15,36,'Real'),
+    (214501239987,4,26,9,'Nogueira'),
+    (124501236889,5,35,4,'Santa Tecla'),
+    (124578512366,6,45,95,'São João do Souto'),
+    (124562335601,7,55,10,'São Paio'),
+    (124568790122,8,65,24,'Celeirós'),
+    (124568790123,9,75,24,'Sequeira'),
+    (124568790124,10,85,24,'Vimieiro'),
+    (124568790125,11,95,24,'Merelim'),
+    (124568790126,12,54,24,'Padim da Graça'),
+    (124568790127,13,12,24,'Navarra'),
+    (124568790128,14,3,24,'Panoias'),
+    (124568790129,15,45,24,'Pedralva'),
+    (124568790130,16,67,24,'Arentim'),
+    (124568790131,17,12,24,'Ferreiros'),
+    (124568790132,18,20,24,'Real'),
+    (124568790133,19,17,24,'Nogueira'),
+    (124568790134,20,18,24,'Santa Tecla'),
+    (124568790135,21,19,24,'São João do Souto'),
+    (124568790136,22,20,24,'São Paio'),
+    (124568790137,23,21,24,'Celeirós'),
+    (124568790138,24,22,24,'Sequeira'),
+    (124568790139,25,23,24,'Vimieiro'),
+    (124568790140,26,24,24,'Merelim'),
+    (124568790141,27,5,24,'Padim da Graça'),
+    (124568790142,28,6,24,'Navarra'),
+    (124568790143,29,75,24,'Panoias'),
+    (124568790144,30,85,24,'Pedralva'),
+]
+
+
 
 # -----------------------------Grafo--------------------------------
 # Aresta: #Inicio, Fim, Distância
 
-grafo = {
-    'Health Planet': [('Celeirós', 4.9), ('Real', 4.5), ('Vimieiro', 2.7)],
-    'Celeirós': [('Panoias', 2.5), ('Pedralva', 2.6), ('Arentim', 3.2)],
-    'Panoias': [('Pedralva', 2.2)],
-    'Pedralva': [('Arentim', 2.1)],
-    'Arentim': [('Sequeira', 6.4)],
-    'Vimieiro': [('Merelim', 1.3), ('Ferreiros', 3.4)],
-    'Merelim': [('Ferreiros', 2.8), ('Padim da Graça', 2.9)],
-    'Ferreiros': [('Padim da Graça', 2.8)],
-    'Real': [('Nogueira', 3.7), ('Santa Tecla', 3.9)],
-    'Nogueira': [('Santa Tecla', 4.3), ('Navarra', 4.8)],
-    'Santa Tecla': [('São João do Souto', 2.15)],
-    'São João do Souto': [('São Paio', 3.8)]
+import math
+from queue import Queue
+
+import networkx as nx  # biblioteca de tratamento de grafos necessária para desnhar graficamente o grafo
+import matplotlib.pyplot as plt  # idem
+
+# Classe nodo para definiçao dos nodos
+# cada nodo tem um nome e um id
+class Node:
+    def __init__(self, name, id=-1):     #  construtor do nodo....."
+        self.m_id = id
+        self.m_name = str(name)
+
+
+    def __str__(self):
+        return "node " + self.m_name
+
+    def setId(self, id):
+        self.m_id = id
+
+    def getId(self):
+        return self.m_id
+
+    def getName(self):
+        return self.m_name
+
+    def __eq__(self, other):
+        return self.m_name == other.m_name
+
+    def __hash__(self):
+        return hash(self.m_name)
+
+
+
+# Constructor
+# Methods for adding edges
+# Methods for removing edges
+# Methods for searching a graph
+# BFS, DFS
+# Other interesting methods
+
+
+class Graph:
+
+    def __init__(self, directed=False):
+        self.m_nodes = []
+        self.m_directed = directed
+        self.m_graph = {}  # dicionario para armazenar os nodos e arestas
+        #self.m_h = {}  # dicionario para posterirmente armazenar as heuristicas para cada nodo -< pesquisa informada
+
+    #############
+    #    escrever o grafo como string
+    #############
+    def __str__(self):
+        out = ""
+        for key in self.m_graph.keys():
+            out = out + "node" + str(key) + ": " + str(self.m_graph[key]) + "\n"
+        return out
+
+    ################################
+    #   encontrar nodo pelo nome
+    ################################
+
+    def get_node_by_name(self, name):
+        search_node = Node(name)
+        for node in self.m_nodes:
+            if node == search_node:
+                return node
+        return None
+
+    ##############################3
+    #   imprimir arestas
+    ############################333333
+
+    def imprime_aresta(self):
+        listaA = ""
+        lista = self.m_graph.keys()
+        for nodo in lista:
+            for (nodo2, custo) in self.m_graph[nodo]:
+                listaA = listaA + nodo + " ->" + nodo2 + " custo:" + str(custo) + "\n"
+        return listaA
+
+    ################
+    #   adicionar   aresta no grafo
+    ######################
+
+    def add_edge(self, node1, node2, weight):
+        n1 = Node(node1)
+        n2 = Node(node2)
+        if (n1 not in self.m_nodes):
+            n1_id = len(self.m_nodes)  # numeração sequencial
+            n1.setId(n1_id)
+            self.m_nodes.append(n1)
+            self.m_graph[node1] = []
+
+        if (n2 not in self.m_nodes):
+            n2_id = len(self.m_nodes)  # numeração sequencial
+            n2.setId(n2_id)
+            self.m_nodes.append(n2)
+            self.m_graph[node2] = []
+
+        self.m_graph[node1].append((node2, weight))  # poderia ser n1 para trabalhar com nodos no grafo
+
+        if not self.m_directed:
+              self.m_graph[node2].append((node1, weight))
+
+
+    #############################
+    # devolver nodos
+    ##########################
+
+    def getNodes(self):
+        return self.m_nodes
+
+    #######################
+    #    devolver o custo de uma aresta
+    ##############3
+
+    def get_arc_cost(self, node1, node2):
+        custoT = math.inf
+        a = self.m_graph[node1]  # lista de arestas para aquele nodo
+        for (nodo, custo) in a:
+            if nodo == node2:
+                custoT = custo
+
+        return custoT
+
+    ##############################
+    #  dado um caminho calcula o seu custo
+    ###############################
+
+    def calcula_custo(self, caminho):
+        # caminho é uma lista de nodos
+        teste = caminho
+        custo = 0
+        i = 0
+        while i + 1 < len(teste):
+            custo = custo + self.get_arc_cost(teste[i], teste[i + 1])
+            i = i + 1
+        return custo
+
+    ################################################################################
+    #     procura DFS
+    ####################################################################################
+
+    def procura_DFS(self, start, end, path=None, visited=None):
+        if path is None:
+            path = []
+        if visited is None:
+            visited = set()
+
+        path = path + [start]
+        visited.add(start)
+
+        if start == end:
+            # calcular o custo do caminho funçao calcula custo.
+            custoT = self.calcula_custo(path)
+            return (path, custoT)
+        for (adjacente, peso) in self.m_graph[start]:
+            if adjacente not in visited:
+                resultado = self.procura_DFS(adjacente, end, path, visited)
+                if resultado is not None:
+                    return resultado
+        return None
+
+
+
+    #####################################################
+    # Procura BFS
+    ######################################################
+
+    def procura_BFS(self, start, end):
+        # definir nodos visitados para evitar ciclos
+        visited = set()
+        fila = Queue()
+        custo = 0
+        # adicionar o nodo inicial à fila e aos visitados
+        fila.put(start)
+        visited.add(start)
+
+        # garantir que o start node nao tem pais...
+        parent = dict()
+        parent[start] = None
+
+        path_found = False
+        while not fila.empty() and path_found == False:
+            nodo_atual = fila.get()
+            if nodo_atual == end:
+                path_found = True
+            else:
+                for (adjacente, peso) in self.m_graph[nodo_atual]:
+                    if adjacente not in visited:
+                        fila.put(adjacente)
+                        parent[adjacente] = nodo_atual
+                        visited.add(adjacente)
+
+        # reconstruir o caminho
+
+        path = []
+        if path_found:
+            path.append(end)
+            while parent[end] is not None:
+                path.append(parent[end])
+                end = parent[end]
+            path.reverse()
+            # funçao calcula custo caminho
+            custo = self.calcula_custo(path)
+        return (path, custo)
+
+    ###########################
+    # desenha grafo  modo grafico
+    #########################
+
+    def desenha(self):
+        ##criar lista de vertices
+        lista_v = self.m_nodes
+        lista_a = []
+        g = nx.Graph()
+        for nodo in lista_v:
+            n = nodo.getName()
+            g.add_node(n)
+            for (adjacente, peso) in self.m_graph[n]:
+                lista = (n, adjacente)
+                # lista_a.append(lista)
+                g.add_edge(n, adjacente, weight=peso)
+
+        pos = nx.spring_layout(g)
+        nx.draw_networkx(g, pos, with_labels=True, font_weight='bold')
+        labels = nx.get_edge_attributes(g, 'weight')
+        nx.draw_networkx_edge_labels(g, pos, edge_labels=labels)
+
+        plt.draw()
+        plt.show()
+
+
+
+
+grafo = Graph()
+
+edges = {
+    'Health Planet': [('Celeirós', 4.9), ('Real', 4.5), ('Vimieiro', 2.7), ('São Vicente', 5)],
+    'Celeirós': [('Panoias', 2.5), ('Pedralva', 2.6), ('Arentim', 3.2), ('São Vitor', 3)],
+    'Panoias': [('Pedralva', 2.2), ('São José de São Lázaro', 4)],
+    'Pedralva': [('Arentim', 2.1), ('São Paio de Arcos', 3)],
+    'Arentim': [('Sequeira', 6.4), ('Cividade', 2)],
+    'Vimieiro': [('Merelim', 1.3), ('Ferreiros', 3.4), ('Maximinos', 3)],
+    'Merelim': [('Ferreiros', 2.8), ('Padim da Graça', 2.9), ('Cabreiros', 4)],
+    'Ferreiros': [('Padim da Graça', 2.8), ('Esporões', 2)],
+    'Real': [('Nogueira', 3.7), ('Santa Tecla', 3.9), ('Gualtar', 5)],
+    'Nogueira': [('Santa Tecla', 4.3), ('Navarra', 4.8), ('Lamaçães', 3)],
+    'Santa Tecla': [('São João do Souto', 2.15), ('Frossos', 2)],
+    'São João do Souto': [('São Paio', 3.8), ('Ruães', 4)],
+    'São Vicente': [('São Vitor', 2), ('São José de São Lázaro', 3)],
+    'São Vitor': [('São Paio de Arcos', 2), ('Cividade', 3)],
+    'São José de São Lázaro': [('Maximinos', 2), ('Cabreiros', 3)],
+    'São Paio de Arcos': [('Esporões', 2), ('Gualtar', 3)],
+    'Cividade': [('Lamaçães', 2), ('Frossos', 3)],
+    'Maximinos': [('Ruães', 2)]
 }
+
+for node1, edges in edges.items():
+    for edge in edges:
+        node2, weight = edge
+        grafo.add_edge(node1, node2, weight)
+
 
 ponto_entrega = ['Arentim', 'Ferreiros', 'Real', 'Nogueira', 'Santa Tecla', 'São João do Souto', 'São Paio', 'Celeirós', 'Sequeira', 'Vimieiro', 'Merelim', 'Padim da Graça', 'Navarra', 'Panoias', 'Pedralva']
 
@@ -117,3 +403,20 @@ estima = {
     'Padim da Graça': 5.7,
     'Ferreiros': 5
 }
+
+ponto_entrega.extend(['São Vicente', 'São Vitor', 'São José de São Lázaro', 'São Paio de Arcos', 'Cividade', 'Maximinos', 'Cabreiros', 'Esporões', 'Gualtar', 'Lamaçães', 'Frossos', 'Ruães'])
+
+estima.update({
+    'São Vicente': 5,
+    'São Vitor': 3,
+    'São José de São Lázaro': 4,
+    'São Paio de Arcos': 3,
+    'Cividade': 2,
+    'Maximinos': 3,
+    'Cabreiros': 4,
+    'Esporões': 2,
+    'Gualtar': 5,
+    'Lamaçães': 3,
+    'Frossos': 2,
+    'Ruães': 4
+})
