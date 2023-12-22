@@ -125,7 +125,6 @@ def numeroTotalEntregasEstafeta(start_date, end_date):
     # obter os estafetas de todas as encomendas no intervalo de tempo especificado
     estafetas = [get_estafeta_by_encomenda(encomenda) for encomenda in encomendas_no_intervalo]
     
-    print(estafetas)
     # contar o numero de estafetas de cada tipo
     estafetas_contados = {}
     for estafeta in estafetas:
@@ -185,13 +184,13 @@ def estafetas_menos_pontuais():
 
 #----------------------------------------Funcionalidade 13----------------------------------------
 
-def all_paths_to_goal(graph, goal):
-    all_paths = []
-    for start in graph.keys():
-        paths = list(dfs_paths(graph, start, goal))
-        if paths:
-            all_paths.extend(paths)
-    return all_paths
+# def all_paths_to_goal(graph, goal):
+#     all_paths = []
+#     for start in graph.keys():
+#         paths = list(dfs_paths(graph, start, goal))
+#         if paths:
+#             all_paths.extend(paths)
+#     return all_paths
 
 #----------------------------------------Funcionalidade 14----------------------------------------
 # Representar os diversos pontos de entrega (freguesias) disponíveis em forma de grafo.
@@ -212,12 +211,90 @@ def show_graph(grafo):
     
 #----------------------------------------Funcionalidade 15----------------------------------------
 
-def circuit_with_max_deliveries(weight_or_volume, grafo):
-    paths = all_paths(grafo)
+# def circuit_with_max_deliveries(weight_or_volume, grafo):
+#     paths = all_paths(grafo)
     
-    if weight_or_volume == 0:
-        max_path = max_deliveries_by_weight(paths, grafo)
-    elif weight_or_volume == 1:
-        max_path = max_deliveries_by_volume(paths, grafo)
+#     if weight_or_volume == 0:
+#         max_path = max_deliveries_by_weight(paths, grafo)
+#     elif weight_or_volume == 1:
+#         max_path = max_deliveries_by_volume(paths, grafo)
         
-    return max_path
+#     return max_path
+
+#----------------------------------------Funcionalidade 16----------------------------------------
+
+ # 1 - DFS
+ # 2 - BFS
+ # 3 - Limitada em Profundidade
+ # 4 - Gulosa
+ # 5 - A*
+def produtividade(enc_id, metodo):
+    # Obter a encomenda
+
+    encomenda = get_encomenda_por_entregar_by_id(enc_id)
+
+
+    if metodo == 1:
+        caminho = (resolveDFS(encomenda[0]), resolveDFSTempo(encomenda[0]))
+    elif metodo == 2:
+        caminho = (resolveBFS(encomenda[0]), resolveBFSTempo(encomenda[0]))
+    elif metodo == 3:
+        caminho = (resolveDLS(encomenda[0],5), resolveDLSTempo(encomenda[0],5))
+    elif metodo == 4:
+        caminho = (resolveGulosa(encomenda[0]), resolveGulosaTempo(encomenda[0]))
+    elif metodo == 5:
+        caminho = (resolveAStar(encomenda[0]), resolveAStarTempo(encomenda[0]))
+    
+    # obter distancia e tempo do caminho
+    distancia = caminho[0][1]
+    tempo = caminho[1][1]
+    return (distancia, tempo)
+
+#----------------------------------------Funcionalidade 16----------------------------------------
+# obter os caminhos de uma encomenda para um determinado metodo de pesquisa
+
+def caminhos_encomenda(enc_id, metodo):
+    # Obter a encomenda
+
+    encomenda = get_encomenda_por_entregar_by_id(enc_id)
+
+
+    if metodo == 1:
+        caminho = resolveDFS(encomenda[0])
+    elif metodo == 2:
+        caminho = resolveBFS(encomenda[0])
+    elif metodo == 3:
+        caminho = resolveDLS(encomenda[0],5)
+    elif metodo == 4:
+        caminho = resolveGulosa(encomenda[0])
+    elif metodo == 5:
+        caminho = resolveAStar(encomenda[0])
+    
+    return caminho
+
+#----------------------------------------Funcionalidade 18----------------------------------------
+
+# comparaçao entre os metodos de pesquisa, correr todos os metodos para todas as encomendas e obter todas todas as estatisticas, como tempo de execuçao, distancia percorrida, numero de nos expandidos, etc
+
+import time
+
+def comparacao_metodos():
+    
+    mapa_metodos = {1: "DFS", 2: "BFS", 3: "DLS", 4: "Gulosa", 5: "A*"}
+    resultados = []
+    for metodo in mapa_metodos.keys():
+        for encomenda in encomendas_por_entregar:
+            # obter tempo de execuçao
+            start_time = time.time()
+            print (f"Encomenda: {encomenda[0]}")
+            prod = produtividade(encomenda[0], metodo)
+            resultados.append(prod)
+            end_time = time.time()
+            execution_time = end_time - start_time
+            print("--------------------------------------------------")
+            print(f"Tempo de execução para a encomenda {encomenda[0]} e método {mapa_metodos[metodo]}: {execution_time} segundos")
+            print(f"Caminho percorrido: {prod[0]} Kms")
+            print(f"Tempo de entrega: {prod[1]} horas")
+            print("--------------------------------------------------")
+
+    return resultados

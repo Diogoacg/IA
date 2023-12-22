@@ -10,6 +10,11 @@ def get_encomenda_by_id(id_enc):
     for order in encomendas:
         if order[0] == id_enc:
             return order
+        
+def get_encomenda_por_entregar_by_id(id_enc):
+    for order in encomendas_por_entregar:
+        if order[0] == id_enc:
+            return order
 # Estafeta: #IdEstaf, [ (#IdEnc,Nota,Transporte,Freguesia) | T]
 
 # Encomenda: #IdEnc, #IdCliente, Peso, Volume, Prazo, DataInicio, DataFim
@@ -55,12 +60,15 @@ def get_encomenta_by_client(client_id):
 
 def get_estafeta_by_encomenda(lista_de_encomendas):
     estafeta_id = 0
+    lista_de_estafetas = []
     for encomenda in lista_de_encomendas:
         for estafeta in estafetas:
             for order in estafeta[1]:
                 if order[0] == encomenda:
                     estafeta_id = estafeta[0]
-    return estafeta_id
+                    lista_de_estafetas.append(estafeta_id)
+                    
+    return lista_de_estafetas
 
 def get_encomenda_by_estafeta(estafeta_id):
     lista_de_encomendas = []
@@ -149,10 +157,10 @@ def racio_estafeta(id_estaf, l):
 
 
 def preco_encomenda(id_enc):
-    print(id_enc)
+
     encomenda = get_encomenda_by_id(id_enc)
     transporte = get_transporte_by_encomenda(id_enc)
-    print(transporte)
+
 
     peso = encomenda[2]
     vol = encomenda[3]
@@ -200,49 +208,49 @@ def precos_lista_encomendas(lista_de_encomendas):
     return [preco_encomenda(id_enc[0]) for id_enc in lista_de_encomendas]
 
 
-# Gerar os circuitos de entrega, caso existam, que cubram um determinado território. 
-def dfs_paths(graph, start, goal):
-    stack = [(start, [start])]
-    while stack:
-        (vertex, path) = stack.pop()
-        if vertex in graph:  # Verifique se a chave existe no dicionário
-            for next in set([neighbor[0] for neighbor in graph[vertex]]) - set(path):
-                if next == goal:
-                    yield path + [next]
-                else:
-                    stack.append((next, path + [next]))
+# # Gerar os circuitos de entrega, caso existam, que cubram um determinado território. 
+# def dfs_paths(graph, start, goal):
+#     stack = [(start, [start])]
+#     while stack:
+#         (vertex, path) = stack.pop()
+#         if vertex in graph:  # Verifique se a chave existe no dicionário
+#             for next in set([neighbor[0] for neighbor in graph[vertex]]) - set(path):
+#                 if next == goal:
+#                     yield path + [next]
+#                 else:
+#                     stack.append((next, path + [next]))
 
 
-#devolve todos os caminhos possiveis do grafo
-def all_paths(grafo):
-    all_paths = []
-    for start in grafo.keys():
-        paths = list(dfs_paths(grafo, start, start))
-        if paths:
-            all_paths.extend(paths)
-    return all_paths
+# #devolve todos os caminhos possiveis do grafo
+# def all_paths(grafo):
+#     all_paths = []
+#     for start in grafo.ge
+#         paths = list(dfs_paths(grafo, start, start))
+#         if paths:
+#             all_paths.extend(paths)
+#     return all_paths
 
 #maximo de entregas por peso
 
-def max_deliveries_by_weight(paths, grafo):
-    max_weight = 0
-    max_path = []
-    for path in paths:
-        weight = sum([grafo[path[i]][path[i + 1]][0][1] for i in range(len(path) - 1)])
-        if weight > max_weight:
-            max_weight = weight
-            max_path = path
-    return max_path
+# def max_deliveries_by_weight(paths, grafo):
+#     max_weight = 0
+#     max_path = []
+#     for path in paths:
+#         weight = sum([grafo[path[i]][path[i + 1]][0][1] for i in range(len(path) - 1)])
+#         if weight > max_weight:
+#             max_weight = weight
+#             max_path = path
+#     return max_path
 
-def max_deliveries_by_volume(paths, grafo):
-    max_volume = 0
-    max_path = []
-    for path in paths:
-        volume = sum([grafo[path[i]][path[i + 1]][0][2] for i in range(len(path) - 1)])
-        if volume > max_volume:
-            max_volume = volume
-            max_path = path
-    return max_path
+# def max_deliveries_by_volume(paths, grafo):
+#     max_volume = 0
+#     max_path = []
+#     for path in paths:
+#         volume = sum([grafo[path[i]][path[i + 1]][0][2] for i in range(len(path) - 1)])
+#         if volume > max_volume:
+#             max_volume = volume
+#             max_path = path
+#     return max_path
 
 # algoritmos de pesquisa
 
@@ -289,7 +297,9 @@ def find_peso(id_enc):
             return order[2]
 
 # Now we can define our main functions
-def resolveDFS(start_node, goal_node):
+def resolveDFS(id_enc):
+    start_node = 'Health Planet'
+    goal_node = find_destination(id_enc)
     path, distance = grafo.procura_DFS(start_node, goal_node)
     if path is None:  # No path found
         return None, float('inf')
@@ -306,7 +316,6 @@ def resolveDFSTempo( id_enc):
     else:
         path, distance = result
 
-    print(distance)
     # Calculate delivery time based on some function tempoEntregaEncomenda
     time = tempoEntregaEncomenda(id_enc, distance)
 
@@ -314,7 +323,9 @@ def resolveDFSTempo( id_enc):
 
 
 
-def resolveBFS(start_node, goal_node):
+def resolveBFS(id_enc):
+    start_node = 'Health Planet'
+    goal_node = find_destination(id_enc)
     path, distance = grafo.procura_BFS(start_node, goal_node)
     if path is None:  # No path found
         return None, float('inf')
@@ -331,7 +342,86 @@ def resolveBFSTempo(id_enc):
     else:
         path, distance = result
 
-    print(distance)
+    # Calculate delivery time based on some function tempoEntregaEncomenda
+    time = tempoEntregaEncomenda(id_enc, distance)
+
+    return path + path[::-1], time
+
+def resolveDLS(id_enc, limit):
+    start_node = 'Health Planet'
+    goal_node = find_destination(id_enc)
+    result = grafo.procura_DLS(start_node, goal_node, limit)
+    if result is None:  # No path found
+        return None, float('inf')
+    else:
+        path, distance = result
+    # Double the distance because it's a round trip
+    return path + path[::-1], distance * 2
+
+def resolveDLSTempo(id_enc, limit):
+    start_node = 'Health Planet'
+    goal_node = find_destination(id_enc)
+
+    result = grafo.procura_DLS(start_node, goal_node, limit)
+    if result is None:  # No path found
+        return None, float('inf')
+    else:
+        path, distance = result
+
+    # Calculate delivery time based on some function tempoEntregaEncomenda
+    time = tempoEntregaEncomenda(id_enc, distance)
+
+    return path + path[::-1], time
+
+def resolveGulosa(id_enc):
+    start_node = 'Health Planet'
+    goal_node = find_destination(id_enc)
+    result = grafo.procura_gulosa(start_node, goal_node)
+    if result is None:  # No path found
+        return None, float('inf')
+    else:
+        path, distance = result
+    # Double the distance because it's a round trip
+    return path + path[::-1], distance * 2
+
+def resolveGulosaTempo(id_enc):
+    start_node = 'Health Planet'
+    goal_node = find_destination(id_enc)
+
+    result = grafo.procura_gulosa(start_node, goal_node)
+    if result is None:  # No path found
+        return None, float('inf')
+    else:
+        path, distance = result
+
+    # Calculate delivery time based on some function tempoEntregaEncomenda
+    time = tempoEntregaEncomenda(id_enc, distance)
+
+    return path + path[::-1], time
+
+def resolveAStar(id_enc):
+    start_node = 'Health Planet'
+    goal_node = find_destination(id_enc)
+    result = grafo.a_star_search(start_node, goal_node)
+
+    if result is None:  # No path found
+        return None, float('inf')
+    else:
+        path, distance = result
+    # Double the distance because it's a round trip
+    return path + path[::-1], distance * 2
+
+def resolveAStarTempo(id_enc):
+    start_node = 'Health Planet'
+    goal_node = find_destination(id_enc)
+
+    result = grafo.a_star_search(start_node, goal_node)
+    
+    if result is None:  # No path found
+        return None, float('inf')
+    else:
+        path, distance = result
+
     # Calculate delivery time based on some function tempoEntregaEncomenda
     time = tempoEntregaEncomenda(id_enc, distance)
 
@@ -351,11 +441,11 @@ def meioDeTransporteUsado(peso_total):
 # Define a function to calculate delivery speed based on transportation method and weight
 def velocidadeEntrega(transporte, peso):
     if transporte == 'Bicicleta':
-        return 10 - peso * 0.7
+        return 10 - peso * 0.6
     elif transporte == 'Mota':
         return 35 - peso * 0.5
     elif transporte == 'Carro':
-        return 25 - peso * 0.1
+        return 50 - peso * 0.1
     else:
         return None
 

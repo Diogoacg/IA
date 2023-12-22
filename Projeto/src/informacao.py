@@ -1,3 +1,6 @@
+import heapq
+
+
 # ---------------------------Encomenda---------------------------
 
 # Encomenda: #IdEnc, #IdCliente, Peso, Volume, Prazo, DataInicio, DataFim
@@ -149,6 +152,18 @@ class Node:
     def __hash__(self):
         return hash(self.m_name)
 
+class PriorityQueue:
+    def __init__(self):
+        self.elements = []
+    
+    def empty(self):
+        return len(self.elements) == 0
+    
+    def put(self, item, priority):
+        heapq.heappush(self.elements, (priority, item))
+    
+    def get(self):
+        return heapq.heappop(self.elements)[1]
 
 
 # Constructor
@@ -230,6 +245,12 @@ class Graph:
 
     def getNodes(self):
         return self.m_nodes
+    
+    #############################
+    # heuristica
+    ##########################
+    def heuristic(a, b):
+        return estima[b]
 
     #######################
     #    devolver o custo de uma aresta
@@ -257,6 +278,33 @@ class Graph:
             custo = custo + self.get_arc_cost(teste[i], teste[i + 1])
             i = i + 1
         return custo
+    
+    ################################################################################
+    #     gerar todos os caminhos entre dois nodos
+    ####################################################################################
+    
+    def generate_all_paths_from_to(self, start_node, end_node):
+        visited = {node: False for node in self.m_graph}
+
+        # Call the recursive helper function from the start_node
+        path = [start_node]
+        self.generate_all_paths_util(start_node, end_node, visited, path)
+
+    def generate_all_paths_util(self, current_node, end_node, visited, path):
+        visited[current_node] = True
+
+        if current_node == end_node:
+            print(' -> '.join(path))
+        else:
+            for neighbour, _ in self.m_graph[current_node]:
+                if not visited[neighbour]:
+                    path.append(neighbour)
+                    self.generate_all_paths_util(neighbour, end_node, visited, path)
+                    path.pop()
+
+        visited[current_node] = False
+
+        
 
     ################################################################################
     #     procura DFS
@@ -325,6 +373,112 @@ class Graph:
             # funçao calcula custo caminho
             custo = self.calcula_custo(path)
         return (path, custo)
+    
+    ###########################
+    # Procura Limitada em Profundidade
+    #########################
+    
+    def procura_DLS(self, start, end, limit, path=None, visited=None):
+        if path is None:
+            path = []
+        if visited is None:
+            visited = set()
+
+        path = path + [start]
+        visited.add(start)
+
+        # Verificar se atingimos o limite de profundidade
+        if len(path) > limit:
+            return None
+
+        if start == end:
+            # calcular o custo do caminho funçao calcula custo.
+            custoT = self.calcula_custo(path)
+            return (path, custoT)
+        for (adjacente, peso) in self.m_graph[start]:
+            if adjacente not in visited:
+                resultado = self.procura_DLS(adjacente, end, limit, path, visited)
+                if resultado is not None:
+                    return resultado
+        return None
+    ###########################
+    # Gulosa - pesquisa informada
+    #########################
+    
+  
+    def procura_gulosa(self, start, end, path=None, visited=None):
+        if path is None:
+            path = []
+        if visited is None:
+            visited = set()
+
+        path = path + [start]
+        visited.add(start)
+
+        if start == end:
+            # calcular o custo do caminho funçao calcula custo.
+            custoT = self.calcula_custo(path)
+            return (path, custoT)
+
+        # Criar uma lista prioritária para armazenar os nós adjacentes
+        adjacentes = []
+
+        for (adjacente, peso) in self.m_graph[start]:
+            if adjacente not in visited:
+                # Adicionar o nó adjacente e a estimativa para o final à lista prioritária
+                heapq.heappush(adjacentes, (estima[adjacente], adjacente))
+
+        # Enquanto houver nós na lista prioritária
+        while adjacentes:
+            # Obter o nó com a menor estimativa
+            (_, proximo_nodo) = heapq.heappop(adjacentes)
+
+            resultado = self.procura_gulosa(proximo_nodo, end, path, visited)
+            if resultado is not None:
+                return resultado
+
+        return None
+    
+    ###########################
+    # A* - pesquisa informada
+    #########################
+    
+    def a_star_search(self, start, goal):
+        frontier = PriorityQueue()
+        frontier.put(start, 0)
+        came_from = {}
+        cost_so_far = {}
+        came_from[start] = None
+        cost_so_far[start] = 0
+        
+        while not frontier.empty():
+            current = frontier.get()
+            
+            if current == goal:
+                break
+            
+            for next in self.m_graph[current]:
+                new_cost = cost_so_far[current] + self.get_arc_cost(current, next[0])
+                if next[0] not in cost_so_far or new_cost < cost_so_far[next[0]]:
+                    cost_so_far[next[0]] = new_cost
+                    priority = new_cost + estima[next[0]]
+                    frontier.put(next[0], priority)
+                    came_from[next[0]] = current
+
+        # Reconstruct the path
+        path = []
+        current = goal
+        while current is not None:
+            path.append(current)
+            current = came_from[current]
+        path.reverse()
+
+        return path, cost_so_far[goal]
+
+        
+    
+    
+    
 
     ###########################
     # desenha grafo  modo grafico
@@ -385,38 +539,39 @@ for node1, edges in edges.items():
 
 ponto_entrega = ['Arentim', 'Ferreiros', 'Real', 'Nogueira', 'Santa Tecla', 'São João do Souto', 'São Paio', 'Celeirós', 'Sequeira', 'Vimieiro', 'Merelim', 'Padim da Graça', 'Navarra', 'Panoias', 'Pedralva']
 
-estima = {
-    'Health Planet': 0,
-    'Vimieiro': 2.7,
-    'Celeirós': 4.5,
-    'Real': 4.5,
-    'Nogueira': 7.5,
-    'Navarra': 9,
-    'Santa Tecla': 6.5,
-    'São João do Souto': 8,
-    'São Paio': 4,
-    'Panoias': 6.7,
-    'Pedralva': 7,
-    'Arentim': 6.2,
-    'Sequeira': 11,
-    'Merelim': 2,
-    'Padim da Graça': 5.7,
-    'Ferreiros': 5
-}
 
 ponto_entrega.extend(['São Vicente', 'São Vitor', 'São José de São Lázaro', 'São Paio de Arcos', 'Cividade', 'Maximinos', 'Cabreiros', 'Esporões', 'Gualtar', 'Lamaçães', 'Frossos', 'Ruães'])
 
-estima.update({
+#heuristica 
+#Essas estimativas foram calculadas adicionando a menor distância entre o nó atual e seus vizinhos à estimativa heurística do vizinho. Por exemplo, para 'Celeirós', pegamos a menor distância entre 'Celeirós' e seus vizinhos (que é 2.5 para 'Panoias') e adicionamos à estimativa heurística de 'Panoias' (que é 4.9), resultando em 7.4.
+# apenas estimativas para os pontos de entrega
+estima = {
+    'Health Planet': 0,
+    'Celeirós': 4.9,
+    'Panoias': 7.4,
+    'Pedralva': 7.5,
+    'Arentim': 8.1,
+    'Vimieiro': 2.7,
+    'Merelim': 4,
+    'Ferreiros': 6.4,
+    'Real': 4.5,
+    'Nogueira': 8.2,
+    'Santa Tecla': 8.4,
+    'São João do Souto': 10.55,
     'São Vicente': 5,
-    'São Vitor': 3,
-    'São José de São Lázaro': 4,
-    'São Paio de Arcos': 3,
-    'Cividade': 2,
-    'Maximinos': 3,
-    'Cabreiros': 4,
-    'Esporões': 2,
-    'Gualtar': 5,
-    'Lamaçães': 3,
-    'Frossos': 2,
-    'Ruães': 4
-})
+    'São Vitor': 7,
+    'São José de São Lázaro': 8,
+    'São Paio de Arcos': 9,
+    'Cividade': 10,
+    'Maximinos': 5,
+    'Ruães': 7,
+    'Sequeira': 14.5,
+    'Padim da Graça': 9.7,
+    'Cabreiros': 11,
+    'Esporões': 11.4,
+    'Gualtar': 12,
+    'Navarra': 13.1,
+    'Lamaçães': 13,
+    'Frossos': 10.15,
+    'São Paio': 14.35
+}

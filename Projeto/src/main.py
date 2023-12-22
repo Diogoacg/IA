@@ -33,11 +33,10 @@ def funcs():
             'Consultar os estefetas menos pontuais a fazer as suas entregas.',
             'Gerar os circuitos de entrega, caso existam, que cubram um determinado território.',
             'Representar os diversos pontos de entrega (freguesias) disponíveis em forma de grafo.',
-            'Identificar quais os circuitos com maior número de entregas (por volume e peso).',
             'Comparar circuitos de entrega tendo em conta os indicadores de produtividade.',
-            'Escolher o circuito mais rápido para entregar uma dada encomenda, utilizado um algoritmo de pesquisa.',
-            'Escolher o circuito mais ecológico para entregar uma dada encomenda, utilizado um algoritmo de pesquisa.',
-            'Identificar quais os circuitos com maior número de entregas.'
+            'Mostrar o circuito obtido por um algoritmo de pesquisa.',
+
+            'Comparar os algoritmos de pesquisa em termos de tempo de execução e eficiencia.'
         ]
 
         for i, option in enumerate(options, 1):
@@ -149,18 +148,17 @@ def funcionalidade(option):
         
         print('-----------------------------------------------------------------------------------------------------------------------')
     def func13():
-        print('-----------------------------------------------------------------------------------------------------------------------')
-        print('Territórios disponíveis: ')
-        print(grafo.keys())
-        print('-----------------------------------------------------------------------------------------------------------------------')
+        # print('-----------------------------------------------------------------------------------------------------------------------')
+        # print('Territórios disponíveis: ')
+        # print(grafo.
+        # print('-----------------------------------------------------------------------------------------------------------------------')
         
         Input = input("Indique o território a consultar: \n")
         
-        if pontoEntrega(grafo, Input):
-            L = all_paths_to_goal(grafo, Input)
-            print(L)
-        else:
-            print('Não existem informações sobre este território.')
+        # if pontoEntrega(grafo, Input):
+        grafo. generate_all_paths_from_to('Health Planet', Input)
+        # else:
+        #     print('Não existem informações sobre este território.')
 
     def func12():
         print('-----------------------------------------------------------------------------------------------------------------------')
@@ -174,29 +172,73 @@ def funcionalidade(option):
         grafo.desenha()
         print('-----------------------------------------------------------------------------------------------------------------------')
     #'Identificar quais os circuitos com maior número de entregas (por volume e peso).',
-    def func15():
-        print('-----------------------------------------------------------------------------------------------------------------------')
-        print('Para calcular o circuito com maior número de entregas, escolha uma das opções abaixo: ')
-        print('0. Peso')
-        print('1. Volume')
-        print('-----------------------------------------------------------------------------------------------------------------------')
-        weight_or_volume = int(input('Escolha um: '))
+    # def func15():
+    #     print('-----------------------------------------------------------------------------------------------------------------------')
+    #     print('Para calcular o circuito com maior número de entregas, escolha uma das opções abaixo: ')
+    #     print('0. Peso')
+    #     print('1. Volume')
+    #     print('-----------------------------------------------------------------------------------------------------------------------')
+    #     weight_or_volume = int(input('Escolha um: '))
 
-        print('Circuito com maior número de entregas: ')
-        print(circuit_with_max_deliveries(weight_or_volume, grafo))
-        print('-----------------------------------------------------------------------------------------------------------------------')
+    #     print('Circuito com maior número de entregas: ')
+    #     print(circuit_with_max_deliveries(weight_or_volume, grafo))
+    #     print('-----------------------------------------------------------------------------------------------------------------------')
         
     def func16():
         print('-----------------------------------------------------------------------------------------------------------------------')
         print('Comparar circuitos de entrega tendo em conta os indicadores de produtividade.')
-        
-        for order in encomendas_por_entregar:
-            print('-----------------------------------------------------------------------------------------------------------------------')
-            print('Encomenda: ', order)
-            print('Circuito DFS: ', resolveDFSTempo(order[0]))
-            print('Circuito BFS: ', resolveBFSTempo(order[0]))
-            print('-----------------------------------------------------------------------------------------------------------------------')
+        # get encomenda id inteiro
+        Input = int(input('Insira o id da encomenda: '))
 
+        print('Profundidade (DFS):')
+        (D1, T1) = produtividade(Input, 1)
+        print(f'*** Distância: {D1} km')
+        print(f'*** Tempo: {T1} horas\n')
+
+        print('Largura (BFS):')
+        D2, T2 = produtividade(Input, 2)
+        print(f'*** Distância: {D2} km')
+        print(f'*** Tempo: {T2} horas\n')
+
+        print('Limitada em Profundidade:')
+        D3, T3 = produtividade(Input, 3)
+        print(f'*** Distância: {D3} km')
+        print(f'*** Tempo: {T3} horas\n')
+
+        print('Gulosa (Greedy):')
+        D4, T4 = produtividade(Input, 4)
+        print(f'*** Distância: {D4} km')
+        print(f'*** Tempo: {T4} horas\n')
+
+        print('A Estrela (A*):')
+        D5, T5 = produtividade(Input, 5)
+        print(f'*** Distância: {D5} km')
+        print(f'*** Tempo: {T5} horas\n')
+
+        print('-----------------------------------------------------------------------------------------------------------------------')
+        
+    def func17():
+        print('-----------------------------------------------------------------------------------------------------------------------')
+        print('Mostrar o circuito obtido por um algoritmo de pesquisa.')
+        # get encomenda id inteiro
+        Input = int(input('Insira o id da encomenda: '))
+        print('Profundidade (DFS):')
+        print(caminhos_encomenda(Input, 1))
+        print('Largura (BFS):')
+        print(caminhos_encomenda(Input, 2))
+        print('Limitada em Profundidade:')
+        print(caminhos_encomenda(Input, 3))
+        print('Gulosa (Greedy):')
+        print(caminhos_encomenda(Input, 4))
+        print('A Estrela (A*):')
+        print(caminhos_encomenda(Input, 5))
+        print('-----------------------------------------------------------------------------------------------------------------------')
+        
+    def func18():
+        print('-----------------------------------------------------------------------------------------------------------------------')
+        print('Comparar os algoritmos de pesquisa em termos de tempo de execução e eficiencia.')
+        comparacao_metodos()
+    
     case = {
          '1': func1,
          '2': func2,
@@ -212,11 +254,9 @@ def funcionalidade(option):
          '12': func12,
         '13': func13,
         '14': func14,
-        '15': func15,
-        '16': func16,
-        # '17': func17,
-        # '18': func18,
-        # '19': func19,
+        '15': func16,
+        '16': func17,
+        '17': func18,
         # '20': func20
     }
     
