@@ -1,49 +1,49 @@
-# Health Planet Delivery System ( Projeto de IA (UM) )
+# Health Planet Delivery System (AI Project (UM))
 
-## Descrição do Projeto
+## Project Description
 
-Este projeto consiste em um sistema de consulta de dados e estatísticas relacionados às entregas feitas pela empresa Health Planet. A aplicação permite aos usuários acessar diversas informações sobre as entregas, os estafetas (couriers), clientes, meios de transporte utilizados, entre outros dados, através de um menu interativo.
+This project consists of a system for querying data and statistics related to deliveries made by the company Health Planet. The application allows users to access various information about deliveries, couriers, clients, transportation means used, among other data, through an interactive menu.
 
-## Estrutura do Projeto
+## Project Structure
 
-O projeto está organizado em dois módulos principais:
+The project is organized into two main modules:
 
-- `funcs.py`: Contém as funções que implementam as diversas funcionalidades oferecidas pelo sistema.
-- `informacao.py`: Contém as funções que lidam com os dados e estatísticas relacionadas às entregas.
-- `auxiliares.py`:  Contém funções auxilares para o ficheiro `informacao.py`
-  
-## Funcionalidades Implementadas
+- `funcs.py`: Contains functions that implement various functionalities offered by the system.
+- `informacao.py`: Contains functions that handle data and statistics related to deliveries.
+- `auxiliares.py`: Contains auxiliary functions for the `informacao.py` file.
 
-O sistema oferece as seguintes funcionalidades:
+## Implemented Functionalities
 
-1. **Consultar o estafeta que utilizou mais vezes um meio de transporte mais ecológico.**
-2. **Consultar os estafetas que entregaram determinada(s) encomenda(s) a um determinado cliente.**
-3. **Consultar os clientes servidos por um determinado estafeta.**
-4. **Calcular o valor faturado pela Health Planet num determinado dia.**
-5. **Consultar quais as zonas (rua ou freguesia) com maior volume de entregas por parte da Health Planet.**
-6. **Calcular a classificação média de satisfação de cliente para um determinado estafeta.**
-7. **Consultar o número total de entregas pelos diferentes meios de transporte, num determinado intervalo de tempo.**
-8. **Consultar o número total de entregas pelos estafetas, num determinado intervalo de tempo.**
-9. **Calcular o número de encomendas entregues e não entregues pela Health Planet, num determinado período de tempo.**
-10. **Calcular o peso total transportado por estafeta num determinado dia.**
-11. **Consultar o cliente que fez mais encomendas.**
-12. **Consultar os estafetas menos pontuais a fazer as suas entregas.**
-13. **Gerar os circuitos de entrega, caso existam, que cubram um determinado território.**
-14. **Representar os diversos pontos de entrega (freguesias) disponíveis em forma de grafo.**
-15. **Comparar circuitos de entrega tendo em conta os indicadores de produtividade.**
-16. **Mostrar o circuito obtido por um algoritmo de pesquisa.**
-17. **Comparar os algoritmos de pesquisa em termos de tempo de execução e eficiência.**
+The system offers the following functionalities:
 
-# Execução
-Para executar o projeto, siga os seguintes passos:
+1. **Query the courier who most often used an eco-friendly mode of transportation.**
+2. **Query the couriers who delivered specific order(s) to a particular client.**
+3. **Query the clients served by a specific courier.**
+4. **Calculate the amount billed by Health Planet on a specific day.**
+5. **Query the areas (street or district) with the highest volume of deliveries by Health Planet.**
+6. **Calculate the average customer satisfaction rating for a specific courier.**
+7. **Query the total number of deliveries by different means of transportation within a specified time interval.**
+8. **Query the total number of deliveries by couriers within a specified time interval.**
+9. **Calculate the number of orders delivered and undelivered by Health Planet within a specified time period.**
+10. **Calculate the total weight transported by a courier on a specific day.**
+11. **Query the client who placed the most orders.**
+12. **Query the least punctual couriers in making their deliveries.**
+13. **Generate delivery routes, if any, that cover a specific territory.**
+14. **Represent the various delivery points (districts) as a graph.**
+15. **Compare delivery routes based on productivity indicators.**
+16. **Display the route obtained by a search algorithm.**
+17. **Compare search algorithms in terms of execution time and efficiency.**
 
-Certifique-se de que todas as dependências necessárias estão instaladas.
-Execute o arquivo principal main.py:
+# Execution
+To run the project, follow these steps:
+
+Make sure all necessary dependencies are installed.
+Run the main file `main.py`:
+
 ```bash
 python main.py
 ```
-Utilize o menu interativo para acessar as funcionalidades desejadas.
+Use the interactive menu to access the desired functionalities.
 
-# Conclusão
-
-Este projeto fornece uma ferramenta completa para consultar e analisar dados relacionados às entregas feitas pela Health Planet. Ele utiliza uma abordagem modular, permitindo fácil expansão e manutenção das funcionalidades.
+# Conclusion
+This project provides a comprehensive tool for querying and analyzing data related to deliveries made by Health Planet. It uses a modular approach, allowing for easy expansion and maintenance of functionalities.
