@@ -10,7 +10,8 @@ O projeto está organizado em dois módulos principais:
 
 - `funcs.py`: Contém as funções que implementam as diversas funcionalidades oferecidas pelo sistema.
 - `informacao.py`: Contém as funções que lidam com os dados e estatísticas relacionadas às entregas.
-
+- `auxiliares.py`:  Contém funções auxilares para o ficheiro `informacao.py`
+  
 ## Funcionalidades Implementadas
 
 O sistema oferece as seguintes funcionalidades:
@@ -32,18 +33,6 @@ O sistema oferece as seguintes funcionalidades:
 15. **Comparar circuitos de entrega tendo em conta os indicadores de produtividade.**
 16. **Mostrar o circuito obtido por um algoritmo de pesquisa.**
 17. **Comparar os algoritmos de pesquisa em termos de tempo de execução e eficiência.**
-
-## Estrutura do Código
-
-### `main.py`
-
-O arquivo principal que contém o menu interativo e chama as funções apropriadas com base na escolha do usuário.
-
-### `funcs.py`
-Contém as definições das funções específicas para cada funcionalidade.
-
-### `informacao.py`
-Contém as funções auxiliares que recuperam e processam os dados necessários para as funcionalidades.
 
 # Execução
 Para executar o projeto, siga os seguintes passos:
