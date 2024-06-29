@@ -39,10 +39,10 @@ O sistema oferece as seguintes funcionalidades:
 
 O arquivo principal que contém o menu interativo e chama as funções apropriadas com base na escolha do usuário.
 
-### funcs.py
+### `funcs.py`
 Contém as definições das funções específicas para cada funcionalidade.
 
-### informacao.py
+### `informacao.py`
 Contém as funções auxiliares que recuperam e processam os dados necessários para as funcionalidades.
 
 # Execução
